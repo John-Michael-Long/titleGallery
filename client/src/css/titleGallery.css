@@ -84,7 +84,7 @@
 }
 
 .title-gallery .image-gallery-slide {
-  display: block;
+  display: flex;
   justify-content: center;
   background-color: transparent;
 }
