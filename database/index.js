@@ -19,6 +19,7 @@ connection.connect((err) => {
 
 connection.query = util.promisify(connection.query);
 
+// inserts into "roomImageUrls" column 
 const insertImagesUrls = async (data) => {
   try {
     await connection.query('INSERT INTO photos (roomImageUrls) VALUES ?', [data]);
@@ -28,10 +29,13 @@ const insertImagesUrls = async (data) => {
   }
 };
 
+// retreives document from DB with selected ID
 const getAllImagesUrlsByRoomId = async (roomId) => {
   try {
     const response = connection.query('SELECT * FROM photos WHERE id = ?', roomId);
     const data = (await response).map(row => Object.assign({}, row));
+
+    //NOTE: data: [ {id: 3, roomImageUrls: "long string"} ]
     return data;
   } catch (err) {
     throw err;

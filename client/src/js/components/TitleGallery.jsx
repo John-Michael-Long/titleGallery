@@ -14,7 +14,7 @@ const picUrl = '/headerphotos';
 
 const fetchPics = async (roomId) => {
   // remove this later:
-  const newRoomId = roomId >= 1020 ? Math.floor(Math.random() * 20) + 1000 : roomId;
+  const newRoomId = roomId >= 20 ? Math.floor(Math.random() * 20): roomId;
   // *****************
 
   const composedUrl = `${picUrl}/${newRoomId}`;
@@ -47,9 +47,10 @@ const mapDispatchToProps = (dispatch) => {
 class ConnectedTitleGallery extends React.Component {
   componentDidMount() {
    // console.log(document.location.pathname)
-    this.fetchPics(document.location.pathname.replace('/', ''));
+    this.fetchPics(parseInt(document.location.pathname.replace('/', ''), 10) - 10000000);
   }
 
+  //WHY IS THIS IN A WRAPPER FUNCTION???? DOES COMPONENT-DID-MOUNT INVOKE THIS ???
   fetchPics(roomId) {
     fetchPics(roomId)
       .then((pics) => {

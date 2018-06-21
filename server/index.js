@@ -35,14 +35,14 @@ app.use((req, res, next) => {
 
 // serve up the pages
 app.use('/:id', express.static(path.join(__dirname, '../public')));
-app.get('/favicon.ico', (req, res) => res.status(204));
+app.get('/favicon.ico', (req, res) => res.status(204));   
 
 // handle /headerphotos routes
 app.use('/headerphotos', headerPhotos);
 
 // handle error
 
-//WHAT IS THIS FOR???????
+//if not found above
 app.use((req, res, next) => {
   const error = new Error('Not found');
   error.status = 404;
@@ -50,8 +50,7 @@ app.use((req, res, next) => {
 });
 
 
-//  WHAT IS THIS FOR??????????
-
+//second err handler to handle errors from router
 /* eslint-disable no-unused-vars */
 app.use((error, req, res, next) => {
   res.status(error.status || 500);
@@ -62,6 +61,7 @@ app.use((error, req, res, next) => {
   });
 });
 /* eslint-enable no-unused-vars */
+
 
 // determine listening port
 const port = process.env.serverPort || 3005;
