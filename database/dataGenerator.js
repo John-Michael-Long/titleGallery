@@ -1,5 +1,6 @@
 const fs = require('fs');
 const loremIpsum = require('lorem-ipsum');
+const faker = require('faker');
 
 const partOneCount = {
   1000: 8,
@@ -47,6 +48,9 @@ const output = loremIpsum({
 //https://picsum.photos/200/300/?random
 //https://loremflickr.com/320/240/brazil,rio
 
+var fileName = 'exampleData.txt' 
+//var fileName = 'dummyData.txt';
+
 
 function randomDate(start, end) {
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
@@ -54,12 +58,11 @@ function randomDate(start, end) {
 }
 const locations =  ["Paris", "Rome", "Venice", "Berlin", "Madrid", "Ibiza", "Dublin", "London", "Santorini", "Mykonos", "Panama", "Barcelona", "Cadiz"]
 
-const generateEntry = (uniqueID) => {
+const generateListing = (uniqueID) => {
   let reviewsCount = Math.floor( Math.random() * 10) + 1
   let reviewsArray = [];
-  let key = Math.floor( Math.random() * 20) + 1000;
-  let imageCount = partOneCount[key];
-  let thumbnails = [];
+  let key = Math.floor( Math.random() * 125) + 1000;
+  let imageCount = partOneCount[key] || 6;
 
   for (let i = 0; i < reviewsCount; i++){
     reviewsArray.push(loremIpsum({
@@ -73,33 +76,201 @@ const generateEntry = (uniqueID) => {
     }))
   }
 
-  for (let i = 0; i < imageCount + 1; i++){
-    thumbnails.push( `${key}home${i}.jpg` )
-  }
-
-  photoData = {
+  listingData = {
     uniqueID: uniqueID, 
     mainImage: `${key}home${0}.jpg`,
+    price: faker.finance.amount(),
     title: loremIpsum({count: 3, units: 'words', format: 'plain'}),
     description: loremIpsum({count: 2, units: 'sentences', sentenceLowerBound: 5, sentenceUpperBound: 10, format: 'plain'}),
     location: locations[ Math.floor( Math.random() * locations.length ) ],
     reviews: reviewsArray,
     dateSubmited: randomDate(new Date(2012, 0, 1), new Date()),
-    submitter: loremIpsum({count: 1, units: 'words', format: 'plain'}),
+    host: Math.floor( Math.random() * 1000) + 1,
     likes: Math.floor( Math.random() * 1000) + 1,
-    thumbnails: thumbnails
+    thumbnailSet: key,
+    thumbnailCount: reviewsCount
   }
   
-  fs.appendFile('dummyData.txt', '\n'+JSON.stringify(photoData), function(err) {
-    if (err) { 
-      console.error(err);
-    } else {
-      console.log("saved to file!");
-    }
-  });
+  // fs.appendFile(fileName, '\n'+JSON.stringify(photoData, null, 2), function(err) {
+  //   if (err) { 
+  //     console.error(err);
+  //   } else {
+  //     console.log("saved to file!");
+  //   }
+  // });
 
 }
-for(let i = 1; i < 101; i++){
-  generateEntry(i);
+
+// var entryCount = 10
+// for(let i = 1; i < entryCount + 1; i++){
+//   generateEntry(i);
+// }
+
+const generateImageEntry = () => {
+  let thumbnails = [];
+  let count = 0;
+  let fileName = 'imageData.txt'
+  let set = 1000;
+
+  while(count < 1000){
+    let imageCount = partOneCount[set] || 6;
+
+    for(let i = 0; i < imageCount + 1; i++){
+      let thumbnail = {
+        entryID: count,
+        imageSet: set,
+        thumbnailID: i,
+        imgFileName: `${set}home${i}.jpg`,
+        likes: Math.floor( Math.random() * 1000) + 1,
+        submitterID: Math.floor( Math.random() * 1000) + 1
+      };
+
+      fs.appendFile(fileName, '\n'+JSON.stringify(thumbnail, null, 2), function(err) {
+        if (err) { 
+          console.error(err);
+        } else {
+          console.log("saved to file!");
+        }
+      })
+      count++;
+    }
+    set++;
+  }  
 }
+
+const generateHost = (hostID) => {
+  let hostData = {
+    hostID: hostID,
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName(),
+    email: faker.internet.email(),
+    phoneNumber: faker.phone.phoneNumberFormat(),
+    address: {
+      street: faker.address.streetAddress(),
+      city: faker.address.city(), 
+      state: faker.address.stateAbbr(),
+      zip: faker.address.zipCode()
+    }
+  }
+  return (hostData);
+}
+
+const pg = require('pg');
+const connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/listings_db';
+
+//const client = new pg.Client(connectionString);
+//client.connect();
+
+const hostData = generateHost(1008)
+
+console.log('hostData: ', hostData);
+
+pg.connect(connectionString, (err, client, done) => {
+  // Handle connection errors
+  if(err) {
+    done();
+    console.log('error:', err);
+    return;
+  }
+//  let street = JSON.stringify(hostData.address.street);
+
+
+
+  const test = `INSERT INTO hostdata (hostid, firstname, lastname, email, phonenumber, street, city, state, zip) VALUES (${hostData.hostID}, "${hostData.firstName}", "${hostData.lastName}", "${hostData.email}", "${hostData.phoneNumber}", "${hostData.address.street}", "${hostData.address.city}", "${hostData.address.state}", "${hostData.address.zip}")`
+
+  //const test = `INSERT INTO hostdata VALUES (${hostData.hostID}, "${hostData.firstName}", "${hostData.lastName}", "${hostData.email}", "${hostData.phoneNumber}", "${hostData.address.street}", "${hostData.address.city}", "${hostData.address.state}", "${hostData.address.zip}")`
+
+  const query = client.query(test,
+    (err, result) => {
+      if(err){
+        console.log('instert err:', err)
+      } else {
+        console.log('success:', result)
+      }
+    }
+  ).on('end', () => { client.end(); });
+
+});
+
+//query.on('end', () => { client.end(); });
+//generateHost(5);
+//generateImageEntry(1007)
+
+
+    // 'INSERT INTO hostdata (hostid, firstname, lastname, email, phonenumber, street, city, state, zip)'+
+    // `VALUES (${hostData.hostID}, "${hostData.firstName}", "${hostData.lastName}", `+
+    // `"${hostData.email}", "${hostData.phoneNumber}", "${hostData.address.street}", `+
+    // `"${hostData.address.city}", "${hostData.address.state}", "${hostData.address.zip}")`
+
+
+//NEED TO CHANGE STRINGIFY PARAMS
+
+/*
+may want to use faker (node-module) instead to generate more meaningful names
+Instead of looping here, may want to consider looping when entering in DBs
+use more photos, want to upload all to s3
+start uploading now to s3 
+
+
+EXAMPLE:
+
+listings: ID, likes, title, description, 
+
+thumbnails: ID, url, likes, submitter, 
+
+because we are resuing photos:
+
+listingPhotos: foriegnKey: listingID, foriegnKey: photoID, photoDescription, foriegnKey: submitter, likes, 
+
+SUBMITTERS: ID, name, address, info, etc
+
+QUESTIONS: 
+HOW TO code to ENTER INTO DB?
+- create schema - NOTE make "listingphotos" table last
+- from each object, iterate though object keys and put everything in the right place 
+- extact data and construct query from extracted data
+
+Optimizing:
+- optimizing specific function: example : return top 5 liked photos 
+- could construct a query to have DB find
+- OR get all data and have server do sort
+
+- Casandra lets you make a table to obtimize searchs for specific fucntions
+
+Query Optimizations:
+- Ex in School you could get same result with differnt querys
+
+- nested queries vs join tables
+
+- LOOK UP: optimization techniques for each DBs
+
+- sometimes you will have the server do more work and sometimes DB mroe work 
+
+- EXPLORE: searching through listings tabel is alot faster than listingphotos table
+
+- Consider is it possible to give work to server while server is waiting for DB to retrueve data
+
+DEPLOYMENT OPTIMIZATION:
+  - multiple DBs runding on seperate servers
+
+TESTING?
+- Unit tests next week for server code 
+- benchmarking: 
+    - multiple tests getting random IDs
+    - document each optimization change and result
+
+
+- this week: benchmarking database - enter query in shell (exact query that will be from server)
+- record all changes
+
+*/
+
+
+
+
+
+
+
+
+
 

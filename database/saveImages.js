@@ -1,5 +1,7 @@
 const axios = require('axios')
 const fs = require('fs')
+const loremIpsum = require('lorem-ipsum');
+const faker = require('faker');
 
 const partOneCount = {
   1000: 8,
@@ -28,7 +30,6 @@ const partOneCount = {
 // var allUrls = [];
 
 const savePhotos = (obj) => {
-  
   let keys = Object.keys(obj);
 
   keys.forEach((key) => {
@@ -48,6 +49,36 @@ const savePhotos = (obj) => {
   });
 };
 
-savePhotos(partOneCount);
+//savePhotos(partOneCount);
+
+
+const saveDummyPhotos = () => {
+  let count = 120;
+  let set = 1021;
+
+  while(count < 1000) {
+    for(let i = 0; i < 7; i++){
+      console.log('count:', count)
+      axios({
+        method:'get',
+        url: 'https://loremflickr.com/640/480',
+        responseType:'stream'
+        })
+        .then(function(response) {
+        response.data.pipe(fs.createWriteStream(`../../galleryImages/${set}home${i}.jpg`))
+        console.log('file saved!')
+      });
+      count++;
+    }
+  set++;  
+  }
+}
+
+saveDummyPhotos()
+
+
+
+
+
 
 
