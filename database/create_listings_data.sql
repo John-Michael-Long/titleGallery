@@ -7,7 +7,7 @@ CREATE TABLE "listing_data" (
  "description" character varying(150) NOT NULL,
  "location" character varying(50) NOT NULL,
  "reviews_str" character varying(250) NOT NULL,
- "date_submitted" date NOT NULL,
+ "date_submitted" character varying(50) NOT NULL,
  "rating" numeric NOT NULL,
  "thumbnail_count" integer NOT NULL,
  "thumbnail_set" integer NOT NULL,

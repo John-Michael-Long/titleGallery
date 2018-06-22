@@ -5,7 +5,7 @@ const generateHost = './dataGenerator.js'
 const insertImageData = function() {
   let fileName = 'imageData.csv';
   let queryStr = "COPY image_data (entry_id, image_set, thumbnail_id, img_file_name, likes, submitter_id)" +
-  " FROM '/Users/johnm.long/Documents/SystemDesignCapstone/titleGallery/database/imageData.csv' WITH DELIMITER ',' CSV HEADER"
+  " FROM '/Users/johnm.long/Documents/SystemDesignCapstone/titleGallery/dataGeneration/imageData.csv' WITH DELIMITER ',' CSV HEADER"
 
 //~"+ __dirname + "
   console.log('query:', queryStr)

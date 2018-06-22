@@ -88,15 +88,31 @@ const generateListing = (uniqueID) => {
     thumbnailCount: imageCount
   }
 
-  console.log('listing:', listingData)
+  return (`${listingData.listing_id}, ${listingData.main_image}, ${listingData.price}, ` +
+    `${listingData.title}, ${listingData.description}, ${listingData.location}, ${listingData.reviews_str}, ` +
+    `${listingData.dateSubmited}, ${listingData.host}, ${listingData.likes},`+
+    ` ${listingData.thumbnailSet}, ${listingData.thumbnailCount}`)
+
 }
+generateListing(1024)
 
 const saveListingsToCSV = (writer) => {
+  let csvHeader = ['listing_id','main_image','price','title','description','location','reviews_str','dateSubmited','host', 'likes', 'thumbnailSet','thumbnailCount'];
   let entryNumber = 1000;
   let i = 1;
+  let fileName = 'listingData.csv'
+
+  fs.appendFile(fileName, csvHeader.join(), function(err) {
+      if (err) { 
+        console.error(err);
+      } else {
+        console.log("saved headers");
+      }
+  })
+
   const write = () => {
     let ok = true;
-    do {
+    do { 
       if (i % 100 === 0) {
         console.log(`${i} has been added.`)
       }
@@ -114,6 +130,7 @@ const saveListingsToCSV = (writer) => {
   };
   write()
 }
+saveListingsToCSV(fs.createWriteStream('listingsData.csv'))
 
 const generateReviewsEntry = () => {
 
@@ -204,40 +221,37 @@ const generateHost = (hostID) => {
   return (hostData);
 }
 
-const pg = require('pg');
-const connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/listings_db';
+const saveHostToDB = () => {
+  const pg = require('pg');
+  const connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/listings_db';
 
-//const client = new pg.Client(connectionString);
-//client.connect();
-
-
-pg.connect(connectionString, (err, client, done) => {
-  // Handle connection errors
-  if(err) {
-    done();
-    console.log('error:', err);
-    return;
-  }
-  //for(let i = 1000; i < 2001; i++){
-  let hostData = generateHost(1018)
-  const qString = `INSERT INTO hostdata (hostid, firstname, lastname, email, phonenumber, street, city, state, zip) ` +
-  `VALUES (${hostData.hostID}, '${hostData.firstName}', '${hostData.lastName}',`+
-  `'${hostData.email}', '${hostData.phoneNumber}', '${hostData.address.street}', `+
-  `'${hostData.address.city}', '${hostData.address.state}', '${hostData.address.zip}')`
-
-  const query = client.query(qString,
-    (err, result) => {
-      if(err){
-        console.log('insert err:', err)
-      } else {
-        console.log('saved to DB')
-      }
+  pg.connect(connectionString, (err, client, done) => {
+    // Handle connection errors
+    if(err) {
+      done();
+      console.log('error:', err);
+      return;
     }
-  )
+    //for(let i = 1000; i < 2001; i++){
+    let hostData = generateHost(1018)
+    const qString = `INSERT INTO hostdata (hostid, firstname, lastname, email, phonenumber, street, city, state, zip) ` +
+    `VALUES (${hostData.hostID}, '${hostData.firstName}', '${hostData.lastName}',`+
+    `'${hostData.email}', '${hostData.phoneNumber}', '${hostData.address.street}', `+
+    `'${hostData.address.city}', '${hostData.address.state}', '${hostData.address.zip}')`
 
-  //}
+    const query = client.query(qString,
+      (err, result) => {
+        if(err){
+          console.log('insert err:', err)
+        } else {
+          console.log('saved to DB')
+        }
+      }
+    )
   query.on('end', () => { client.end(); });
 });
+}
+
 
 //query.on('end', () => { client.end(); });
 //generateHost(5);

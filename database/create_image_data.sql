@@ -1,18 +1,3 @@
--- CREATE TABLE "host_data" (
--- 	"id" serial NOT NULL,
--- 	"hostid" integer NOT NULL,
--- 	"firstname" character varying(50) NOT NULL,
--- 	"lastname" character varying(50) NOT NULL,
--- 	"email" character varying(100) NOT NULL,
--- 	"phonenumber" character varying(50) NOT NULL,
--- 	"street" character varying(50) NOT NULL,
--- 	"city" character varying(50) NOT NULL,
--- 	"state" character varying(15) NOT NULL,
--- 	"zip" character varying(15) NOT NULL,
--- 	CONSTRAINT host_data_pk PRIMARY KEY ("id")
--- ) WITH (
---   OIDS=FALSE
--- );
 
 CREATE TABLE "image_data" (
 	"id" SERIAL PRIMARY KEY,
