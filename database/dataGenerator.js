@@ -52,18 +52,73 @@ var fileName = 'exampleData.txt'
 //var fileName = 'dummyData.txt';
 
 
-function randomDate(start, end) {
-  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 
-}
-const locations =  ["Paris", "Rome", "Venice", "Berlin", "Madrid", "Ibiza", "Dublin", "London", "Santorini", "Mykonos", "Panama", "Barcelona", "Cadiz"]
 
 const generateListing = (uniqueID) => {
-  let reviewsCount = Math.floor( Math.random() * 10) + 1
-  let reviewsArray = [];
+  
+  function randomDate(start, end) {
+    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+  }
+
+  let locations =  ["Paris", "Rome", "Venice", "Berlin", "Madrid", "Ibiza", "Dublin", "London", "Santorini", "Mykonos", "Panama", "Barcelona", "Cadiz"]
+  
   let key = Math.floor( Math.random() * 125) + 1000;
   let imageCount = partOneCount[key] || 6;
+  let reviewStr = loremIpsum({
+      count: 1                      // Number of words, sentences, or paragraphs to generate.
+    , units: 'paragraphs'            // Generate words, sentences, or paragraphs.
+    , sentenceLowerBound: 2         // Minimum words per sentence.
+    , sentenceUpperBound: 10        // Maximum words per sentence.
+    , paragraphLowerBound: 3        // Minimum sentences per paragraph.
+    , paragraphUpperBound: 7        // Maximum sentences per paragraph.
+    , format: 'plain'})
 
+  listingData = {
+    listing_id: uniqueID, 
+    main_image: `${key}home${0}.jpg`,
+    price: faker.finance.amount(),
+    title: loremIpsum({count: 3, units: 'words', format: 'plain'}),
+    description: loremIpsum({count: 2, units: 'sentences', sentenceLowerBound: 5, sentenceUpperBound: 10, format: 'plain'}),
+    location: locations[ Math.floor( Math.random() * locations.length ) ],
+    reviews_str: reviewStr,
+    dateSubmited: randomDate(new Date(2012, 0, 1), new Date()),
+    host: Math.floor( Math.random() * 1000) + 1,
+    likes: Math.floor( Math.random() * 1000) + 1,
+    thumbnailSet: key,
+    thumbnailCount: imageCount
+  }
+
+  console.log('listing:', listingData)
+}
+
+const saveListingsToCSV = (writer) => {
+  let entryNumber = 1000;
+  let i = 1;
+  const write = () => {
+    let ok = true;
+    do {
+      if (i % 100 === 0) {
+        console.log(`${i} has been added.`)
+      }
+      if (i === entryNumber) {
+        writer.write(`\n`);
+        writer.end();
+      } else {
+        ok = writer.write('somethign')
+      }
+      i += 1;
+    } while (i <= entryNumber && ok);
+    if (i <= entryNumber) {
+      writer.once('drain', write);
+    }
+  };
+  write()
+}
+
+const generateReviewsEntry = () => {
+
+  let reviewsCount = Math.floor( Math.random() * 10) + 1
+  let reviewsArray = [];
   for (let i = 0; i < reviewsCount; i++){
     reviewsArray.push(loremIpsum({
       count: 1                      // Number of words, sentences, or paragraphs to generate.
@@ -75,30 +130,6 @@ const generateListing = (uniqueID) => {
     , format: 'plain' 
     }))
   }
-
-  listingData = {
-    uniqueID: uniqueID, 
-    mainImage: `${key}home${0}.jpg`,
-    price: faker.finance.amount(),
-    title: loremIpsum({count: 3, units: 'words', format: 'plain'}),
-    description: loremIpsum({count: 2, units: 'sentences', sentenceLowerBound: 5, sentenceUpperBound: 10, format: 'plain'}),
-    location: locations[ Math.floor( Math.random() * locations.length ) ],
-    reviews: reviewsArray,
-    dateSubmited: randomDate(new Date(2012, 0, 1), new Date()),
-    host: Math.floor( Math.random() * 1000) + 1,
-    likes: Math.floor( Math.random() * 1000) + 1,
-    thumbnailSet: key,
-    thumbnailCount: reviewsCount
-  }
-  
-  // fs.appendFile(fileName, '\n'+JSON.stringify(photoData, null, 2), function(err) {
-  //   if (err) { 
-  //     console.error(err);
-  //   } else {
-  //     console.log("saved to file!");
-  //   }
-  // });
-
 }
 
 // var entryCount = 10
@@ -106,11 +137,19 @@ const generateListing = (uniqueID) => {
 //   generateEntry(i);
 // }
 
-const generateImageEntry = () => {
+const generateImageEntry = (count = 0) => {
   let thumbnails = [];
-  let count = 0;
-  let fileName = 'imageData.txt'
+  let fileName = 'imageData.csv'
   let set = 1000;
+  let headers = [ 'entryID', 'imageSet','thumbnailID', 'imgFileName', 'likes', 'submitterID']
+       
+  fs.appendFile(fileName, headers.join(), function(err) {
+      if (err) { 
+        console.error(err);
+      } else {
+        console.log("saved to file!");
+      }
+  })
 
   while(count < 1000){
     let imageCount = partOneCount[set] || 6;
@@ -122,10 +161,18 @@ const generateImageEntry = () => {
         thumbnailID: i,
         imgFileName: `${set}home${i}.jpg`,
         likes: Math.floor( Math.random() * 1000) + 1,
-        submitterID: Math.floor( Math.random() * 1000) + 1
+        submitterID: null //Math.floor( Math.random() * 1000) + 1
       };
 
-      fs.appendFile(fileName, '\n'+JSON.stringify(thumbnail, null, 2), function(err) {
+      let dataString = [
+      thumbnail.entryID, 
+      thumbnail.imageSet, 
+      thumbnail.thumbnailID, 
+      thumbnail.imgFileName, 
+      thumbnail.likes, 
+      thumbnail.submitterID]
+
+      fs.appendFile(fileName, '\n'+JSON.parse(JSON.stringify(dataString.join())), function(err) {
         if (err) { 
           console.error(err);
         } else {
@@ -137,6 +184,8 @@ const generateImageEntry = () => {
     set++;
   }  
 }
+
+
 
 const generateHost = (hostID) => {
   let hostData = {
@@ -161,9 +210,6 @@ const connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/
 //const client = new pg.Client(connectionString);
 //client.connect();
 
-const hostData = generateHost(1008)
-
-console.log('hostData: ', hostData);
 
 pg.connect(connectionString, (err, client, done) => {
   // Handle connection errors
@@ -172,24 +218,25 @@ pg.connect(connectionString, (err, client, done) => {
     console.log('error:', err);
     return;
   }
-//  let street = JSON.stringify(hostData.address.street);
+  //for(let i = 1000; i < 2001; i++){
+  let hostData = generateHost(1018)
+  const qString = `INSERT INTO hostdata (hostid, firstname, lastname, email, phonenumber, street, city, state, zip) ` +
+  `VALUES (${hostData.hostID}, '${hostData.firstName}', '${hostData.lastName}',`+
+  `'${hostData.email}', '${hostData.phoneNumber}', '${hostData.address.street}', `+
+  `'${hostData.address.city}', '${hostData.address.state}', '${hostData.address.zip}')`
 
-
-
-  const test = `INSERT INTO hostdata (hostid, firstname, lastname, email, phonenumber, street, city, state, zip) VALUES (${hostData.hostID}, "${hostData.firstName}", "${hostData.lastName}", "${hostData.email}", "${hostData.phoneNumber}", "${hostData.address.street}", "${hostData.address.city}", "${hostData.address.state}", "${hostData.address.zip}")`
-
-  //const test = `INSERT INTO hostdata VALUES (${hostData.hostID}, "${hostData.firstName}", "${hostData.lastName}", "${hostData.email}", "${hostData.phoneNumber}", "${hostData.address.street}", "${hostData.address.city}", "${hostData.address.state}", "${hostData.address.zip}")`
-
-  const query = client.query(test,
+  const query = client.query(qString,
     (err, result) => {
       if(err){
-        console.log('instert err:', err)
+        console.log('insert err:', err)
       } else {
-        console.log('success:', result)
+        console.log('saved to DB')
       }
     }
-  ).on('end', () => { client.end(); });
+  )
 
+  //}
+  query.on('end', () => { client.end(); });
 });
 
 //query.on('end', () => { client.end(); });

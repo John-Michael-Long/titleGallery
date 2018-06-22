@@ -1,4 +1,12 @@
 
+PostgresQL Commands:
+\l  - lists DBs
+\c 'database name'   - connect to DB
+\d   - show all relations
+\dt    - list tables
+\d 'table name'    -list table schema
+
+
 Original Schema
 
 +---------------+---------------+------+-----+---------+----------------+
