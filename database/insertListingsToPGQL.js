@@ -4,7 +4,7 @@ const connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/
 
 const insertListingData = function() {
   let fileName = 'imageData.csv';
-  let queryStr = "COPY listing_data (listing_id,main_image,price,title,description,location,reviews_str,date_submitted,rating,thumbnail_count,thumbnail_set)" +
+  let queryStr = "COPY listing_data (listing_id,main_image,price,title,description,location,reviews_str,date_submitted,rating,thumbnail_count,thumbnail_set,host_id)" +
   " FROM '/Users/johnm.long/Documents/SystemDesignCapstone/titleGallery/dataGeneration/listingData.csv' WITH DELIMITER ','"
 
 //~"+ __dirname + "

@@ -1,4 +1,3 @@
-
 CREATE TABLE "image_data" (
 	"id" SERIAL PRIMARY KEY,
 	"entry_id" integer NOT NULL,
@@ -6,8 +5,11 @@ CREATE TABLE "image_data" (
 	"thumbnail_id" integer NOT NULL,
 	"img_file_name" character varying(30) NOT NULL,
 	"likes" integer NOT NULL,
-	"submitter_id" integer REFERENCES "hostdata"("id")
+	"submitter_id" integer REFERENCES "host_data"("id")
 	)
+
+--psql -U johnm.long -d listings_db -a -f create_image_data.sql
+
 
 -- CREATE TABLE "image_data" (
 -- 	"id" serial PRIMARY KEY,

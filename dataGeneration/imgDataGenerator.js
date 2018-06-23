@@ -29,15 +29,15 @@ const generateImageEntry = (count = 0) => {
   let thumbnails = [];
   let fileName = 'imageData.csv'
   let set = 1000;
-  let headers = [ 'entryID', 'imageSet','thumbnailID', 'imgFileName', 'likes', 'submitterID']
+  // let headers = [ 'entryID', 'imageSet','thumbnailID', 'imgFileName', 'likes', 'submitterID']
        
-  fs.appendFile(fileName, headers.join(), function(err) {
-      if (err) { 
-        console.error(err);
-      } else {
-        console.log("saved to file!");
-      }
-  })
+  // fs.appendFile(fileName, headers.join(), function(err) {
+  //     if (err) { 
+  //       console.error(err);
+  //     } else {
+  //       console.log("saved to file!");
+  //     }
+  // })
 
   while(count < 1000){
     let imageCount = partOneCount[set] || 6;
@@ -49,7 +49,7 @@ const generateImageEntry = (count = 0) => {
         thumbnailID: i,
         imgFileName: `${set}home${i}.jpg`,
         likes: Math.floor( Math.random() * 1000) + 1,
-        submitterID: null //Math.floor( Math.random() * 1000) + 1
+        submitterID: Math.floor( Math.random() * 1000) + 1
       };
 
       let dataString = [

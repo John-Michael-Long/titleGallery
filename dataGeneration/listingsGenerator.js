@@ -66,27 +66,14 @@ const generateListing = (uniqueID) => {
     thumbnailCount: imageCount
   }
 
-  return (`${listingData.listing_id},${listingData.main_image},${listingData.price},${listingData.title},${listingData.description},${listingData.location},${listingData.reviews_str},${listingData.dateSubmited},${listingData.rating},${listingData.thumbnailCount},${listingData.thumbnailSet}`)
+  return (`${listingData.listing_id},${listingData.main_image},${listingData.price},${listingData.title},${listingData.description},${listingData.location},${listingData.reviews_str},${listingData.dateSubmited},${listingData.rating},${listingData.thumbnailCount},${listingData.thumbnailSet},${listingData.host}`)
 
 }
 
 
 const saveListingsToCSV = (writer) => {
-  let csvHeader = ['listing_id','main_image','price','title','description','location',
-                  'reviews_str','dateSubmited','host', 'thumbnailSet','thumbnailCount'];
-
   let entryNumber = 1000;
   let i = 1;
-  let fileName = 'listingData.csv'
-
-  //WRITE HEADER
-  // fs.appendFile(fileName, csvHeader.join(), function(err) {
-  //     if (err) { 
-  //       console.error(err);
-  //     } else {
-  //       console.log("saved header");
-  //     }
-  // });
 
   const write = () => {
     let ok = true;

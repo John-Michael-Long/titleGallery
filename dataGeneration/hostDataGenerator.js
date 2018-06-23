@@ -13,18 +13,17 @@ const generateHost = () => {
     state: faker.address.stateAbbr(),
     zip: faker.address.zipCode()
   }
-  return (hostData);
+  return ( `${hostData.first_name},${hostData.last_name},${hostData.email},${hostData.phone_number},${hostData.street},${hostData.city},${hostData.state},${hostData.zip}` );
 }
-
+//generateHost();
 const saveHostToCSV = (writer) => {
   let entryNumber = 1000;
   let i = 1;
-  let fileName = 'hostData.csv'
 
   const write = () => {
     let ok = true;
     do { 
-      const insertLine = `${generateHost(i)}\n`
+      const insertLine = `${generateHost()}\n`
       if (i % 100 === 0) {
         console.log(`${i} has been added.`)
       }

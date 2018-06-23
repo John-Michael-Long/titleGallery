@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS "host_data";
+
 CREATE TABLE "host_data" (
  "id" serial PRIMARY KEY,
  "first_name" character varying(50) NOT NULL,
