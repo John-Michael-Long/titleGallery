@@ -109,7 +109,6 @@ const generateHost = () => {
   return hostData;
 }
 
-console.time('generate-listings')
 
 exports.generateListing = (uniqueID) => {
   
@@ -186,35 +185,50 @@ const saveListingsToCSV = (writer) => {
 }
 //saveListingsToCSV(fs.createWriteStream('listingData.csv'))
 
-console.timeEnd('generate-listings');
 
+const saveReviewsToCSV = (writer) => {
+  let entryNumber = 25;
+  let i = 1;
 
-// const saveReviewsToCSV = (writer) => {
-//   let entryNumber = 25000000;
-//   let i = 1;
+  const write = () => {
+    let ok = true;
+    do { 
+      let listingData = exports.generateListing(i)
+      let listing = [
+        i,
+        listingData.main_image,
+        listingData.price,
+        listingData.title1,
+        listingData.description,
+        listingData.location,
+        listingData.reviews_str,
+        listingData.dateSubmitted,
+        listingData.rating,
+        listingData.thumbnailCount,
+        listingData.thumbnailSet,
+        JSON.stringify(listingData.host_data),
+        JSON.stringify(listingData.image_data),
+        JSON.stringify(listingData.reviews_data)]
 
-//   const write = () => {
-//     let ok = true;
-//     do { 
-//       const insertLine = `${generateReviewEntry()}\n`
-//       if (i % 100000 === 0) {
-//         console.log(`${i} has been added.`)
-//       }
-//       if (i === entryNumber) {
-//         writer.write(insertLine);
-//         console.timeEnd('generate-reviews');
-//         writer.end();
-//       } else {
+      const insertLine = `${listing.join()}\n`
+      if (i % 100000 === 0) {
+        console.log(`${i} has been added.`)
+      }
+      if (i === entryNumber) {
+        writer.write(insertLine);
 
-//         ok = writer.write(insertLine);
-//       }
-//       i += 1;
-//     } while (i <= entryNumber && ok);
-//     if (i <= entryNumber) {
-//       writer.once('drain', write);
-//     }
-//   };
-//   write()
-// }
-// saveReviewsToCSV(fs.createWriteStream('reviewsData_25M.csv'))
+        writer.end();
+      } else {
+
+        ok = writer.write(insertLine);
+      }
+      i += 1;
+    } while (i <= entryNumber && ok);
+    if (i <= entryNumber) {
+      writer.once('drain', write);
+    }
+  };
+  write()
+}
+//saveReviewsToCSV(fs.createWriteStream('listingData.csv'))
 
