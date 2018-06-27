@@ -1,6 +1,7 @@
 const pg = require('pg');
 const connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/listings_db';
 
+console.time('insert-listings')
 
 const insertListingData = function() {
   let fileName = 'imageData.csv';
@@ -29,3 +30,5 @@ const insertListingData = function() {
 }
 
 insertListingData()
+
+console.timeEnd('insert-listings')

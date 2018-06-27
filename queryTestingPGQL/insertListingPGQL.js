@@ -1,6 +1,9 @@
-const fs = require('fs');
+const pg = require('pg');
+const connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/listings_db';
 const loremIpsum = require('lorem-ipsum');
 const faker = require('faker');
+
+console.time('insert-listing')
 
 const partOneCount = {
   1000: 8,
@@ -26,10 +29,7 @@ const partOneCount = {
   1020: 6,
 };
 
-//NOTE: INVESTIGATE "INDEXING"
-
-
-const generateListing = (uniqueID) => {
+const generateListing = () => {
   
   function randomDate() {
     month = Math.floor(Math.random() * 12) + 1;
@@ -40,19 +40,17 @@ const generateListing = (uniqueID) => {
 
   let locations =  ["Paris", "Rome", "Venice", "Berlin", "Madrid", "Ibiza", "Dublin", "London", "Santorini", "Mykonos", "Panama", "Barcelona", "Cadiz"]
   
-  let key = Math.floor( Math.random() * 125) + 1000;
+  let key = Math.floor( Math.random() * 140) + 1000;
   let imageCount = partOneCount[key] || 6;
   let reviewStr = loremIpsum({
       count: 1                      // Number of words, sentences, or paragraphs to generate.
     , units: 'sentences'            // Generate words, sentences, or paragraphs.
     , sentenceLowerBound: 3         // Minimum words per sentence.
     , sentenceUpperBound:  7      // Maximum words per sentence.
-   // , paragraphLowerBound: 3        // Mirnimum sentences per paragraph.
-   // , paragraphUpperBound: 7        // Maximum sentences per paragraph.
     , format: 'plain'})
 
   listingData = {
-    listing_id: uniqueID, 
+    listing_id: 8, 
     main_image: `${key}home${0}.jpg`,
     price: faker.finance.amount(),
     title: loremIpsum({count: 3, units: 'words', format: 'plain'}),
@@ -60,42 +58,49 @@ const generateListing = (uniqueID) => {
     location: locations[ Math.floor( Math.random() * locations.length ) ],
     reviews_str: reviewStr,
     dateSubmited: randomDate(),
-    host: Math.floor( Math.random() * 1000) + 1,
+    host: Math.floor( Math.random() * 1000000) + 1,
     rating: Math.floor( Math.random() * 100) + 1,
     thumbnailSet: key,
     thumbnailCount: imageCount
   }
 
-  return (`${listingData.listing_id},${listingData.main_image},${listingData.price},${listingData.title},${listingData.description},${listingData.location},${listingData.reviews_str},${listingData.dateSubmited},${listingData.rating},${listingData.thumbnailCount},${listingData.thumbnailSet},${listingData.host}`)
+  return (`'${listingData.listing_id}','${listingData.main_image}','${listingData.price}','${listingData.title}','${listingData.description}','${listingData.location}','${listingData.reviews_str}','${listingData.dateSubmited}','${listingData.rating}','${listingData.thumbnailCount}','${listingData.thumbnailSet}','${listingData.host}'`)
 
 }
 
+const queryTest = function() {
+//INSERT review
 
-const saveListingsToCSV = (writer) => {
-  let entryNumber = 1000;
-  let i = 1;
+let queryStr = `INSERT INTO listing_data (listing_id,main_image,price,title,description,location,reviews_str,date_submitted,rating,thumbnail_count,thumbnail_set,host_id)`+
+` VALUES (${generateListing()})`
 
-  const write = () => {
-    let ok = true;
-    do { 
-      const insertLine = `${generateListing(i)}\n`
-      if (i % 100 === 0) {
-        console.log(`${i} has been added.`)
-      }
-      if (i === entryNumber) {
-        writer.write(insertLine);
-        writer.end();
-      } else {
+  //DELETE FROM listing_data, host_data WHERE listing_data.id = 9143294;
+  //let queryStr = `DELETE FROM listing_data WHERE id = ${9000000 + Math.floor(Math.random()*1000000)}`
 
-        ok = writer.write(insertLine);
-      }
-      i += 1;
-    } while (i <= entryNumber && ok);
-    if (i <= entryNumber) {
-      writer.once('drain', write);
+
+
+  console.log('query:', queryStr)
+  pg.connect(connectionString, (err, client, done) => {
+  // Handle connection errors
+    if(err) {
+      done();
+      console.log('error:', err);
+      return;
     }
-  };
-  write()
-}
-saveListingsToCSV(fs.createWriteStream('listingData.csv'))
 
+    const query = client.query(queryStr, (err, result) => {
+        if(err){
+          console.log('insert err:', err)
+        } else {
+          console.log('result:', result.rows)
+        }
+      })
+    query.on('end', () => { 
+      console.timeEnd('insert-listing')
+      client.end(); 
+    });
+  });
+}
+//queryListingData()
+
+queryTest()

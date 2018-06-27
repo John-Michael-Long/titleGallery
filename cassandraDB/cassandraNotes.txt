@@ -1,0 +1,95 @@
+
+CREATE KEYSPACE Keyspace name
+WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 3};
+
+
+
+Node − It is the place where data is stored.
+
+Data center − It is a collection of related nodes.
+
+Cluster − A cluster is a component that contains one or more data centers.
+
+Commit log − The commit log is a crash-recovery mechanism in Cassandra. Every write operation is written to the commit log.
+
+Mem-table − A mem-table is a memory-resident data structure. After commit log, the data will be written to the mem-table. Sometimes, for a single-column family, there will be multiple mem-tables.
+
+SSTable − It is a disk file to which the data is flushed from the mem-table when its contents reach a threshold value.
+
+Bloom filter − These are nothing but quick, nondeterministic, algorithms for testing whether an element is a member of a set. It is a special kind of cache. Bloom filters are accessed after every query.
+
+Keyspace - the database, container of tables
+
+- Replication factor − It is the number of machines in the cluster that will receive copies of the same data.
+
+- Replica placement strategy − It is nothing but the strategy to place replicas in the ring. We have strategies such as simple strategy (rack-aware strategy), old network topology strategy (rack-aware strategy), and network topology strategy (datacenter-shared strategy).
+
+- Column families − Keyspace is a container for a list of one or more column families. A column family, in turn, is a container of a collection of rows. Each row contains ordered columns. Column families represent the structure of your data. Each keyspace has at least one and often many column families.
+
+  - keys_cached − It represents the number of locations to keep cached per SSTable.
+
+  - rows_cached − It represents the number of rows whose entire contents will be cached in memory.
+
+  - preload_row_cache − It specifies whether you want to pre-populate the row cache.
+
+
+
+
+
+Cassandra Query Language
+Users can access Cassandra through its nodes using Cassandra Query Language (CQL). CQL treats the database (Keyspace) as a container of tables. Programmers use cqlsh: a prompt to work with CQL or separate application language drivers.
+
+Clients approach any of the nodes for their read-write operations. That node (coordinator) plays a proxy between the client and the nodes holding the data.
+
+Write Operations
+Every write activity of nodes is captured by the commit logs written in the nodes. Later the data will be captured and stored in the mem-table. Whenever the mem-table is full, data will be written into the SStable data file. All writes are automatically partitioned and replicated throughout the cluster. Cassandra periodically consolidates the SSTables, discarding unnecessary data.
+
+Read Operations
+During read operations, Cassandra gets values from the mem-table and checks the bloom filter to find the appropriate SSTable that holds the required data.
+
+The data model of Cassandra is significantly different from what we normally see in an RDBMS. This chapter provides an overview of how Cassandra stores its data.
+
+Cluster
+Cassandra database is distributed over several machines that operate together. The outermost container is known as the Cluster. For failure handling, every node contains a replica, and in case of a failure, the replica takes charge. Cassandra arranges the nodes in a cluster, in a ring format, and assigns data to them.
+
+Keyspace
+Keyspace is the outermost container for data in Cassandra. The basic attributes of a Keyspace in Cassandra are −
+
+Replication factor − It is the number of machines in the cluster that will receive copies of the same data.
+
+Replica placement strategy − It is nothing but the strategy to place replicas in the ring. We have strategies such as simple strategy (rack-aware strategy), old network topology strategy (rack-aware strategy), and network topology strategy (datacenter-shared strategy).
+
+Column families − Keyspace is a container for a list of one or more column families. A column family, in turn, is a container of a collection of rows. Each row contains ordered columns. Column families represent the structure of your data. Each keyspace has at least one and often many column families.
+
+
+OPTIMIZED FOR HIGH WRITE VOLUME 
+
+- can string together multipe commands/queries
+compound ID:
+- partition key - groups togather related data
+- uuid - usually-unique ID - specifies order of data within the partition (especially if its chornological order) - NOTE: type 1 uuid has a timestamp
+secondary index (can only have 1 column): CREATE INDEX ON <table> (column)
+collection column: sets, lists, maps
+- we get operations on these collecitons
+- "we can say add this element to this set in this row"
+
+COLUMN FAMILIES:
+
+WIDE ROWS: 
+- each WR sticks together 
+- each WR is on disk in order
+- any given WR is on multiple machines
+
+COMPOUND TYPES:
+
+
+
+CONS: 
+- cannot sort by value
+- cannot make constraints: 'not null', foriegn key constraints, etc
+
+TODO:
+- look up cassandra-loader
+
+
+

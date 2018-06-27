@@ -1,5 +1,14 @@
+BREW:
+brew services list   --list all DBs
+
+CASSANDRA:
+brew services start cassandra
+
+
 
 PostgresQL Commands:
+psql postgres   - enter CLI
+\du   - list users
 \l  - lists DBs
 \c 'database name'   - connect to DB
 \d   - show all relations

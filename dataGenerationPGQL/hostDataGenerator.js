@@ -17,14 +17,14 @@ const generateHost = () => {
 }
 //generateHost();
 const saveHostToCSV = (writer) => {
-  let entryNumber = 1000;
+  let entryNumber = 1000000;
   let i = 1;
 
   const write = () => {
     let ok = true;
     do { 
       const insertLine = `${generateHost()}\n`
-      if (i % 100 === 0) {
+      if (i % 10000 === 0) {
         console.log(`${i} has been added.`)
       }
       if (i === entryNumber) {
