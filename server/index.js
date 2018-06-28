@@ -3,7 +3,7 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const http = require('http');
 const path = require('path');
-const headerPhotos = require('./headerPhotos');
+const routes = require('./routes.js');
 
 const app = express();
 
@@ -34,13 +34,16 @@ app.use((req, res, next) => {
 /* eslint-enable consistent-return */
 
 // serve up the pages
-app.use('/:id', express.static(path.join(__dirname, '../public')));
+//app.use('/:id', express.static(path.join(__dirname, '../public')));
+
 app.get('/favicon.ico', (req, res) => res.status(204));   
 
-// handle /headerphotos routes
-app.use('/headerphotos', headerPhotos);
+// handle /routes routes
+app.use('/headerphotos', routes);
 
-// handle error
+// app.get('/headerphotos/:roomID', (req, res) => {
+//   console.log('REQUEST:', req.params)
+// })
 
 //if not found above
 app.use((req, res, next) => {
@@ -48,7 +51,6 @@ app.use((req, res, next) => {
   error.status = 404;
   next(error);
 });
-
 
 //second err handler to handle errors from router
 /* eslint-disable no-unused-vars */

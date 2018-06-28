@@ -6,7 +6,7 @@ console.time('insert-listings')
 const insertListingData = function() {
   let fileName = 'imageData.csv';
   let queryStr = "COPY listing_data (listing_id,main_image,price,title,description,location,reviews_str,date_submitted,rating,thumbnail_count,thumbnail_set,host_id)" +
-  " FROM '/Users/johnm.long/Documents/SystemDesignCapstone/titleGallery/dataGeneration/listingData.csv' WITH DELIMITER ','"
+  " FROM '/Users/johnm.long/Documents/SystemDesignCapstone/titleGallery/dataGenerationPGQL/listingData.csv' WITH DELIMITER ','"
 
 //~"+ __dirname + "
   console.log('query:', queryStr)

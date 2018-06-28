@@ -4,7 +4,7 @@ const connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/
 
 const insertHostData = function() {
   let queryStr = "COPY host_data (first_name,last_name,email,phone_number,street,city,state,zip)" +
-  " FROM '/Users/johnm.long/Documents/SystemDesignCapstone/titleGallery/dataGeneration/hostData.csv' WITH DELIMITER ','"
+  " FROM '/Users/johnm.long/Documents/SystemDesignCapstone/titleGallery/dataGenerationPGQL/hostData.csv' WITH DELIMITER ','"
 
 //~"+ __dirname + "
   console.log('query:', queryStr)

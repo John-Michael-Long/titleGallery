@@ -1,42 +1,47 @@
 const express = require('express');
-const db = require('../database/index');
+const db = require('../database/dbHandler');
 
 const router = express.Router();
+//'/:roomId'
+router.get('/:roomId', (req, res, next) => {
+  let roomId = parseInt(req.params.roomId)
+  db.getAllImagesUrlsByRoomId(roomId, (err, dbData) => {
+    if(err){
+      res.status(404);
+      res.send(err);
+    } else {
+      res.status(200)
+      res.json(dbData)
+    }
+  })
+});
 
-//const roomIdAdjustment = 0;
+  //TODO: format data
+  
 
-router.get('/:roomId', async (req, res, next) => {
-  let roomId = parseInt(req.params.roomId, 10);
+ 
 
-  //roomId += roomIdAdjustment; 
-
-  try {
-
+//  try {
     //RETRIEVES DATA WITH DB HANDLER FUNCITON
-    const data = (await db.getAllImagesUrlsByRoomId(roomId))[0];
-
+  //  const data = (await db.getAllImagesUrlsByRoomId(roomId))[0];
     //NOTE: data is now object: {id: 3, roomImageUrls: "long string of urls"}
-
     //SPLITS INTO ARRAY AND MAPS TO ARRAY OF OBJECTS
-    data.roomImageUrls = data.roomImageUrls.split('&-&-&').map(url => ({ original: url, thumbnail: url }));
-
+    //data.roomImageUrls = data.roomImageUrls.split('&-&-&').map(url => ({ original: url, thumbnail: url }));
     //NOTE: data is now in this form: {id: 3, roomImageUrls: [
     //  {original: "url string", thumbnail: "url string"},
     //  {original: "url string", thumbnail: "url string"},
     //  {original: "url string", thumbnail: "url string"} ]
 
-    //data.id -= roomIdAdjustment;
+  //   res.status(200);
+  //   res.json(data);   //returns back to client
+  // } catch (err) {
+  //   next(err);  //NOTE: this points back to (second) error handler
+  // }
 
-    res.status(200);
-    res.json(data);   //returns back to client
-  } catch (err) {
-    next(err);  //NOTE: this points back to (second) error handler
-  }
-});
 
 router.post('/:roomId', async (req, res, next) => {
   let roomId = parseInt(req.params.roomId, 10);
-  roomId += roomIdAdjustment;
+
   console.log('entered post:', roomId);
 
 })

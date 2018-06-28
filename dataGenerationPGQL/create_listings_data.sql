@@ -13,7 +13,9 @@ CREATE TABLE "listing_data" (
  "rating" numeric NOT NULL,
  "thumbnail_count" integer NOT NULL,
  "thumbnail_set" integer NOT NULL,
- "host_id" integer REFERENCES "host_data"("id")
+ "host_id" integer NOT NULL
  )
+
+-- REFERENCES "host_data"("id")
 
 --psql -U johnm.long -d listings_db -a -f create_listings_data.sql

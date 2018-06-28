@@ -71,13 +71,13 @@ const generateListing = () => {
 const queryTest = function() {
 //INSERT review
 
-let queryStr = `INSERT INTO listing_data (listing_id,main_image,price,title,description,location,reviews_str,date_submitted,rating,thumbnail_count,thumbnail_set,host_id)`+
-` VALUES (${generateListing()})`
+// let queryStr = `INSERT INTO listing_data (listing_id,main_image,price,title,description,location,reviews_str,date_submitted,rating,thumbnail_count,thumbnail_set,host_id)`+
+// ` VALUES (${generateListing()})`
 
-  //DELETE FROM listing_data, host_data WHERE listing_data.id = 9143294;
-  //let queryStr = `DELETE FROM listing_data WHERE id = ${9000000 + Math.floor(Math.random()*1000000)}`
+//  let queryStr = `DELETE FROM reviews_data WHERE reviews_data.listing_id = 9500001;`
+//  let queryStr = `DELETE FROM listing_data WHERE id = ${9000000 + Math.floor(Math.random()*1000000)}`
 
-
+let queryStr = `UPDATE listing_data SET description = 'updated description!!!' WHERE id = 9900001`
 
   console.log('query:', queryStr)
   pg.connect(connectionString, (err, client, done) => {
@@ -104,3 +104,15 @@ let queryStr = `INSERT INTO listing_data (listing_id,main_image,price,title,desc
 //queryListingData()
 
 queryTest()
+
+
+//CREATE INDEX reviews_index ON reviews_data (listing_id)
+//CREATE INDEX listing_index ON listing_data (host_id)
+
+//SELECT * FROM listing_data, reviews_data, host_data, image_data WHERE listing_data.id = 9900003 AND image_data.image_set = listing_data.thumbnail_set AND host_data.id = image_data.submitter_id;
+
+//SELECT * FROM listing_data INNER JOIN reviews_data ON listing_data.id = 9900003
+
+
+//, host_data, image_data WHERE listing_data.id = 9900003 AND image_data.image_set = listing_data.thumbnail_set AND host_data.id = image_data.submitter_id;
+

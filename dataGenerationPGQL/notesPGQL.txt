@@ -1,0 +1,169 @@
+BREW:
+brew services list   --list all DBs
+
+CASSANDRA:
+brew services start cassandra
+
+
+
+PostgresQL Commands:
+psql postgres   - enter CLI
+\du   - list users
+\l  - lists DBs
+\c 'database name'   - connect to DB
+\d   - show all relations
+\dt    - list tables
+\d 'table name'    -list table schema
+
+
+OPTIMIZATION TECHNIQUES
+
+1. Define Business Requirements before Beginning
+In a previous article we covered best practices to define business requirements for BI. Those practices should be applied when optimizing SQL queries, including:
+
+Identifying relevant stakeholders. Make sure all involved parties are in the discussion of developing your query. When querying production databases, make sure the DBA team is included.
+Focusing on business outcomes. Be sure the query has a definite and unique purpose. Taxing the production database for exploratory or duplicative reports is an unnecessary risk.
+Framing the discussion for good requirements. Define the function and scope of the report by identifying its intended audience. This will focus the query on the tables with the correct level of detail.
+Develop good requirements by asking great questions. Those questions typically follow the 5 W’s – Who? What? Where? When? Why?
+Write very specific requirements and confirm them with stakeholders. The performance of the production database is too critical to have unclear or ambiguous requirements. Make sure the requirements are as specific as possible, and confirm the requirements with all stakeholders before running the query.
+2. Define SELECT Fields instead of SELECT *
+When running exploratory queries, many SQL developers use SELECT * (read as “select all”) as a shorthand to query all available data from a table. However, if a table has many fields and many rows, this taxes database resources in querying a lot of unnecessary data.
+
+Defining fields in the SELECT statement will point the database to querying only the required data to meet the business requirements. Let’s look at an example where the business requirements request mailing addresses for customers.
+
+Inefficient:
+
+SELECT *
+FROM Customers
+
+This query may pull in other data also stored in the customer table, such as phone numbers, activity dates, and notes from sales and customer service.
+
+Efficient:
+
+SELECT FirstName, LastName, Address, City, State, Zip
+FROM Customers
+
+This query only pulls the required information for mailing addresses.
+
+To keep an index of all tables and field names, run a query from a system table such as INFORMATION_SCHEMA or ALL_TAB_COLUMNS (for MS SQL Server – more information can be found here).
+
+3. Select More Fields to Avoid SELECT DISTINCT
+SELECT DISTINCT is a handy way to remove duplicates from a query. SELECT DISTINCT works by GROUPing all fields in the query to create distinct results. To accomplish this goal however, a large amount of processing power is required. Additionally, data may be grouped to the point of being inaccurate. To avoid using SELECT DISTINCT, more fields should be selected to create unique results.
+
+Inefficient and inaccurate:
+
+SELECT DISTINCT FirstName, LastName, State
+FROM Customers
+
+This query doesn’t account for multiple people in the same state having the same first and last name. Popular names such as David Smith or Diane Johnson will be grouped together, causing an inaccurate number of records. In larger databases, a large number of David Smith’s and Diane Johnson’s will cause this query to run slowly.
+
+Efficient and accurate:
+
+SELECT FirstName, LastName, Address, City, State, Zip
+FROM Customers
+
+By adding more fields, unduplicated records were returned without using SELECT DISTINCT. The database does not have to group any fields, and the number of records is accurate.
+
+4. Create Joins with INNER JOIN Rather than WHERE
+Some SQL developers prefer to make joins with WHERE clauses, such as the following:
+
+SELECT Customers.CustomerID, Customers.Name, Sales.LastSaleDate
+FROM Customers, Sales
+WHERE Customers.CustomerID = Sales.CustomerID
+
+This type of join creates a Cartesian Join, also called a Cartesian Product or CROSS JOIN. In a Cartesian Join, all possible combinations of the variables are created. In this example, if we had 1,000 customers with 1,000 total sales, the query would first generate 1,000,000 results, then filter for the 1,000 records where CustomerID is correctly joined. This is an inefficient use of database resources, as the database has done 100x more work than required. Cartesian Joins are especially problematic in large-scale databases, as a Cartesian Join of two large tables could create billions or trillions of results.
+
+To prevent creating a Cartesian Join, INNER JOIN should be used instead:
+
+SELECT Customers.CustomerID, Customers.Name, Sales.LastSaleDate
+FROM Customers
+   INNER JOIN Sales
+   ON Customers.CustomerID = Sales.CustomerID
+
+The database would generate the 1,000 desired records where CustomerID is equal.
+
+Some DBMS systems are able to recognize WHERE joins and automatically run them as INNER JOINs instead. In those DBMS systems, there will be no difference in performance between a WHERE join and INNER JOIN. However, INNER JOIN is recognized by all DBMS systems. Your DBA will advise you as to which is best in your environment.
+
+5. Use WHERE instead of HAVING to Define Filters
+Similarly to the above mentioend concept, the goal of an efficient query is to pull only the required records from the database. Per the SQL Order of Operations, HAVING statements are calculated after WHERE statements. If the intent is to filter a query based on conditions, a WHERE statement is more efficient.
+
+For example, let’s assume 200 sales have been made in the year 2016, and we want to query for the number of sales per customer in 2016.
+
+SELECT Customers.CustomerID, Customers.Name, Count(Sales.SalesID)
+FROM Customers
+   INNER JOIN Sales
+   ON Customers.CustomerID = Sales.CustomerID
+GROUP BY Customers.CustomerID, Customers.Name
+HAVING Sales.LastSaleDate BETWEEN #1/1/2016# AND #12/31/2016#
+
+This query would pull 1,000 sales records from the Sales table, then filter for the 200 records generated in the year 2016, and finally count the records in the data set.
+
+In comparison, WHERE clauses limit the number of records pulled:
+
+SELECT Customers.CustomerID, Customers.Name, Count(Sales.SalesID)
+FROM Customers 
+  INNER JOIN Sales
+  ON Customers.CustomerID = Sales.CustomerID
+WHERE Sales.LastSaleDate BETWEEN #1/1/2016# AND #12/31/2016#
+GROUP BY Customers.CustomerID, Customers.Name
+
+This query would pull the 200 records from the year 2016, and then count the records in the data set. The first step in the HAVING clause has been completely eliminated.
+
+HAVING should only be used when filtering on an aggregated field. In the query above, we could additionally filter for customers with greater than 5 sales using a HAVING statement.
+
+SELECT Customers.CustomerID, Customers.Name, Count(Sales.SalesID)
+FROM Customers
+   INNER JOIN Sales 
+   ON Customers.CustomerID = Sales.CustomerID
+WHERE Sales.LastSaleDate BETWEEN #1/1/2016# AND #12/31/2016#
+GROUP BY Customers.CustomerID, Customers.Name
+HAVING Count(Sales.SalesID) > 5
+
+Download the whitepaper: the data Mash-up Cheat Sheet
+6. Use Wildcards at the End of a Phrase Only
+When searching plaintext data, such as cities or names, wildcards create the widest search possible. However, the widest search is also the most inefficient search.
+
+When a leading wildcard is used, especially in combination with an ending wildcard, the database is tasked with searching all records for a match anywhere within the selected field.
+
+Consider this query to pull cities beginning with ‘Char’:
+
+SELECT City FROM Customers
+WHERE City LIKE ‘%Char%’
+
+This query will pull the expected results of Charleston, Charlotte and Charlton. However, it will also pull unexpected results, such as Cape Charles, Crab Orchard, and Richardson.
+
+A more efficient query would be:
+
+SELECT City FROM Customers
+WHERE City LIKE ‘Char%’
+
+This query will pull only the expected results of Charleston, Charlotte and Charlton.
+
+7. Use LIMIT to Sample Query Results
+Before running a query for the first time, ensure the results will be desirable and meaningful by using a LIMIT statement. (In some DBMS systems, the word TOP is used interchangeably with LIMIT.) The LIMIT statement returns only the number of records specified. Using a LIMIT statement prevents taxing the production database with a large query, only to find out the query needs editing or refinement.
+
+In the 2016 sales query from above, we will examine a limit of 10 records:
+
+SELECT Customers.CustomerID, Customers.Name, Count(Sales.SalesID)
+FROM Customers
+  INNER JOIN Sales
+  ON Customers.CustomerID = Sales.CustomerID
+WHERE Sales.LastSaleDate BETWEEN #1/1/2016# AND #12/31/2016#
+GROUP BY Customers.CustomerID, Customers.Name
+LIMIT 10
+
+We can see by the sample whether we have a useable data set or not.
+
+8. Run Analytical Queries During Off-Peak Times
+In order to minimize query impact on the production database, talk to a DBA about scheduling the query to run at an off-peak time. The query should run when concurrent users are at their lowest number, which is typically the middle of the night (3 – 5 AM).
+
+The more of the following criteria your query has, the more likely of a candidate it should be to run at night:
+
+Selecting from large tables (>1,000,000 records)
+Cartesian Joins or CROSS JOINs
+Looping statements
+SELECT DISTINCT statements
+Nested subqueries
+Wildcard searches in long text or memo fields
+Multiple schema queries
+Tired of spending time and energy querying your databases to produce BI reports? Sign up for a live demo to see how Sisense helps IT departments and business professionals transition to self-service BI. Just want some more SQL tips and tricks? Check out this guide to retrieving column description in SQL Server. Read our database technology guide to discover the latest innovations in the field.

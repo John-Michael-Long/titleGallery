@@ -5,7 +5,7 @@ const connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/
 
 const insertReviewsData = function() {
   let queryStr = "COPY reviews_data (listing_id, user_id, date_submitted, rating, review)" +
-  " FROM '/Users/johnm.long/Documents/SystemDesignCapstone/titleGallery/dataGeneration/reviewsData_25M.csv' WITH DELIMITER ','"
+  " FROM '/Users/johnm.long/Documents/SystemDesignCapstone/titleGallery/dataGenerationPGQL/reviewsData_25M.csv' WITH DELIMITER ','"
 
 //~"+ __dirname + "
   console.log('query:', queryStr)
@@ -34,4 +34,6 @@ const insertReviewsData = function() {
 }
 
 insertReviewsData()
+
+
 
