@@ -4,7 +4,9 @@ brew services list   --list all DBs
 CASSANDRA:
 brew services start cassandra
 
+CREATE INDEX <index title> ON <table> (<column>);
 
+CREATE INDEX reviews_index ON reviews_data (listing_id);
 
 PostgresQL Commands:
 psql postgres   - enter CLI

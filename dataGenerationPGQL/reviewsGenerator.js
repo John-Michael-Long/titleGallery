@@ -35,7 +35,7 @@ const generateReviewEntry = () => {
 }
 
 const saveReviewsToCSV = (writer) => {
-  let entryNumber = 2500;
+  let entryNumber = 25000000;
   let i = 1;
 
   const write = () => {
