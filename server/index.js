@@ -1,3 +1,4 @@
+require('newrelic');
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
@@ -25,18 +26,17 @@ app.use((req, res, next) => {
   if (req.method === 'OPTIONS') {
     res.header(
       'Access-Control-Allow-Mehods',
-      'GET, POST, PUT, PATCH, DELETE'
-    );
-    return res.status(200).json({});
-  }
-  next();
+      'GET, POST, PUT, PATCH, DELETE');
+    return res.status(200).json({});    //if request is OPTIONS then send back "headers"
+  } 
+  next();   //for everything else, just set the headers and go to the next app.use
 });
 /* eslint-enable consistent-return */
 
 // serve up the pages
 //app.use('/:id', express.static(path.join(__dirname, '../public')));
 
-app.get('/favicon.ico', (req, res) => res.status(204));   
+//app.get('/favicon.ico', (req, res) => res.status(204));   
 
 // handle /routes routes
 app.use('/headerphotos', routes);
@@ -45,7 +45,7 @@ app.use('/headerphotos', routes);
 //   console.log('REQUEST:', req.params)
 // })
 
-//if not found above
+//if it does not go through any routes found above then error
 app.use((req, res, next) => {
   const error = new Error('Not found');
   error.status = 404;

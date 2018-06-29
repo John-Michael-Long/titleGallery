@@ -7,20 +7,17 @@ router.get('/:roomId', (req, res, next) => {
   let roomId = parseInt(req.params.roomId)
   db.getAllImagesUrlsByRoomId(roomId, (err, dbData) => {
     if(err){
-      res.status(404);
-      res.send(err);
+      console.log('err', err)
+      next(err)
     } else {
       res.status(200)
-      res.json(dbData)
+      res.send(dbData)
     }
   })
 });
 
   //TODO: format data
   
-
- 
-
 //  try {
     //RETRIEVES DATA WITH DB HANDLER FUNCITON
   //  const data = (await db.getAllImagesUrlsByRoomId(roomId))[0];
