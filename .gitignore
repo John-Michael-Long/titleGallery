@@ -2,6 +2,8 @@
 .DS_Store
 *.csv
 
+newrelic.js
+
 ## NPM ##
 npm
 npm-debug.log
