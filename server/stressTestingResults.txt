@@ -1,5 +1,5 @@
 
-USING CLIENT.QUERY
+USING CLIENT.QUERY /headerphotos/{{$randomNumber(1, 10000000)}}"
 
 All virtual users finished
 Summary report @ 18:27:24(-0700) 2018-06-28
@@ -19,8 +19,7 @@ Summary report @ 18:27:24(-0700) 2018-06-28
     200: 190600
 
 
-USING POOL
-
+USING POOL /headerphotos/{{$randomNumber(1, 10000000)}}"
 All virtual users finished
 Summary report @ 18:47:39(-0700) 2018-06-28
   Scenarios launched:  1896
@@ -37,3 +36,41 @@ Summary report @ 18:47:39(-0700) 2018-06-28
     0: 1896 (100%)
   Codes:
     200: 189600
+
+
+USING ARTILLERY WITH STATIC ENDPOINT: "/headerphotos/9900001"
+All virtual users finished
+Summary report @ 19:57:34(-0700) 2018-06-28
+  Scenarios launched:  1942
+  Scenarios completed: 1942
+  Requests completed:  194200
+  RPS sent: 617.47
+  Request latency:
+    min: 1
+    max: 455.3
+    median: 2.1
+    p95: 240.8
+    p99: 329.9
+  Scenario counts:
+    0: 1942 (100%)
+  Codes:
+    200: 194200
+
+USING ARTILLERY WITH RANDOM ENDPOINT: "/headerphotos/{{$randomNumber(9000000, 10000000)}}"
+Summary report @ 20:11:27(-0700) 2018-06-28
+  Scenarios launched:  1926
+  Scenarios completed: 1926
+  Requests completed:  192600
+  RPS sent: 558.7
+  Request latency:
+    min: 1
+    max: 2209.1
+    median: 250.7
+    p95: 933.5
+    p99: 1348.7
+  Scenario counts:
+    0: 1926 (100%)
+  Codes:
+    200: 192600
+
+
