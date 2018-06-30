@@ -2,8 +2,7 @@ const fs = require('fs');
 const loremIpsum = require('lorem-ipsum');
 const faker = require('faker');
 
-
-console.time('generate-reviews')
+console.time('generate-reviews');
 
 const partOneCount = {
   1000: 8,
@@ -34,7 +33,7 @@ const generateReviewEntry = () => {
   function randomDate() {
     month = Math.floor(Math.random() * 12) + 1;
     day = Math.floor(Math.random() * 30) + 1;
-    year = 2012 + Math.floor(Math.random() * 6) + 1
+    year = 2012 + Math.floor(Math.random() * 6) + 1;
     return (month + "/" + day + "/" + year);
   }
 
@@ -87,11 +86,8 @@ const generateImageEntry = () => {
         likes: Math.floor( Math.random() * 1000) + 1,
         submitterID: Math.floor( Math.random() * 1000) + 1
       };
-
       thumbnails.push(thumbnail);
-      
     }
-
   return thumbnails;  
 }
 
@@ -115,7 +111,7 @@ exports.generateListing = (uniqueID) => {
   function randomDate() {
     month = Math.floor(Math.random() * 12) + 1;
     day = Math.floor(Math.random() * 30) + 1;
-    year = 2012 + Math.floor(Math.random() * 6) + 1
+    year = 2012 + Math.floor(Math.random() * 6) + 1;
     return (month + "/" + day + "/" + year);
   }
 
@@ -146,9 +142,7 @@ exports.generateListing = (uniqueID) => {
     image_data: generateImageEntry(),
     reviews_data: generateReviewsArray()
   }
-
   return listingData;
-
 }
 
 
@@ -181,7 +175,7 @@ const saveListingsToCSV = (writer) => {
       writer.once('drain', write);
     }
   };
-  write()
+  write();
 }
 //saveListingsToCSV(fs.createWriteStream('listingData.csv'))
 
@@ -228,7 +222,7 @@ const saveReviewsToCSV = (writer) => {
       writer.once('drain', write);
     }
   };
-  write()
+  write();
 }
 //saveReviewsToCSV(fs.createWriteStream('listingData.csv'))
 

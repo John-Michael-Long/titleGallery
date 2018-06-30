@@ -24,7 +24,6 @@ const insertImageData = function() {
           console.log('saved to DB')
         }
       })
-    query.on('end', () => { client.end(); });
   });
 }
 

@@ -35,7 +35,8 @@ const insert = function(count) {
     listingData.thumbnailSet,
     listingData.host_data,
     listingData.image_data,
-    listingData.reviews_data]
+    listingData.reviews_data
+    ]
 
     console.log('params:', params)
 
