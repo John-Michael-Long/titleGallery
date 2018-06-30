@@ -5,7 +5,6 @@ const bodyParser = require('body-parser');
 const http = require('http');
 const path = require('path');
 const routes = require('./routes.js');
-
 const app = express();
 
 // use morgan to log incoming reuests
@@ -15,7 +14,6 @@ app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// handle cors
 /* eslint-disable consistent-return */
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -24,26 +22,19 @@ app.use((req, res, next) => {
     'Origin, X-Requested-With, Content-Type, Accept, Authorization'
   );
   if (req.method === 'OPTIONS') {
-    res.header(
-      'Access-Control-Allow-Mehods',
-      'GET, POST, PUT, PATCH, DELETE');
-    return res.status(200).json({});    //if request is OPTIONS then send back "headers"
+    res.header('Access-Control-Allow-Mehods','GET, POST, PUT, PATCH, DELETE');
+    return res.status(200).json({}); 
   } 
-  next();   //for everything else, just set the headers and go to the next app.use
+  next();  
 });
 /* eslint-enable consistent-return */
 
 // serve up the pages
 //app.use('/:id', express.static(path.join(__dirname, '../public')));
-
 //app.get('/favicon.ico', (req, res) => res.status(204));   
 
-// handle /routes routes
+// handle /headerphotos routes
 app.use('/headerphotos', routes);
-
-// app.get('/headerphotos/:roomID', (req, res) => {
-//   console.log('REQUEST:', req.params)
-// })
 
 //if it does not go through any routes found above then error
 app.use((req, res, next) => {
@@ -64,10 +55,7 @@ app.use((error, req, res, next) => {
 });
 /* eslint-enable no-unused-vars */
 
-
-// determine listening port
 const port = process.env.serverPort || 3005;
-
 const server = http.createServer(app);
 
 module.exports = server;

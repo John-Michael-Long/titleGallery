@@ -2,7 +2,7 @@ const express = require('express');
 const db = require('../database/dbHandler');
 
 const router = express.Router();
-//'/:roomId'
+
 router.get('/:roomId', (req, res, next) => {
   let roomId = parseInt(req.params.roomId)
   db.getAllImagesUrlsByRoomId(roomId, (err, dbData) => {
@@ -15,6 +15,12 @@ router.get('/:roomId', (req, res, next) => {
     }
   })
 });
+
+
+//use redis to cache
+//post requst test
+//use cluster 
+//use pm2 load balancer
 
   //TODO: format data
   
@@ -56,7 +62,6 @@ router.delete('/:roomId', async (req, res, next) => {
   console.log('entered delete:', roomId);
 
 })
-
 
 
 module.exports = router;
