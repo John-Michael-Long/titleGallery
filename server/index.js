@@ -3,7 +3,7 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const http = require('http');
 const path = require('path');
-const headerPhotos = require('./headerPhotos');
+const routes = require('./routes.js');
 
 const app = express();
 
@@ -34,24 +34,25 @@ app.use((req, res, next) => {
 /* eslint-enable consistent-return */
 
 // serve up the pages
-app.use('/:id', express.static(path.join(__dirname, '../public')));
-app.get('/favicon.ico', (req, res) => res.status(204));
+//app.use('/:id', express.static(path.join(__dirname, '../public')));
 
-// handle /headerphotos routes
-app.use('/headerphotos', headerPhotos);
+app.get('/favicon.ico', (req, res) => res.status(204));   
 
-// handle error
+// handle /routes routes
+app.use('/headerphotos', routes);
 
-//WHAT IS THIS FOR???????
+// app.get('/headerphotos/:roomID', (req, res) => {
+//   console.log('REQUEST:', req.params)
+// })
+
+//if not found above
 app.use((req, res, next) => {
   const error = new Error('Not found');
   error.status = 404;
   next(error);
 });
 
-
-//  WHAT IS THIS FOR??????????
-
+//second err handler to handle errors from router
 /* eslint-disable no-unused-vars */
 app.use((error, req, res, next) => {
   res.status(error.status || 500);
@@ -62,6 +63,7 @@ app.use((error, req, res, next) => {
   });
 });
 /* eslint-enable no-unused-vars */
+
 
 // determine listening port
 const port = process.env.serverPort || 3005;

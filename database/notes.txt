@@ -1,0 +1,50 @@
+
+Original Schema
+
++---------------+---------------+------+-----+---------+----------------+
+| Field         | Type          | Null | Key | Default | Extra          |
++---------------+---------------+------+-----+---------+----------------+
+| id            | int(11)       | NO   | PRI | NULL    | auto_increment |
+| roomImageUrls | varchar(1000) | NO   |     | NULL    |                |
++---------------+---------------+------+-----+---------+----------------+
+
+Origional Entry Example: 
+
+
+| 21 | https://s3-us-west-1.amazonaws.com/napbnb/1020home0.jpg&-&-&https://s3-us-west-1.amazonaws.com/napbnb/1020home1.jpg&-&-&https://s3-us-west-1.amazonaws.com/napbnb/1020home2.jpg&-&-&https://s3-us-west-1.amazonaws.com/napbnb/1020home3.jpg&-&-&https://s3-us-west-1.amazonaws.com/napbnb/1020home4.jpg&-&-&https://s3-us-west-1.amazonaws.com/napbnb/1020home5.jpg&-&-&https://s3-us-west-1.amazonaws.com/napbnb/1020home6.jpg 
+
+
+Written Spaced Out: 
+
+| 21 | 
+https://s3-us-west-1.amazonaws.com/napbnb/1020home0.jpg
+&-&-&
+https://s3-us-west-1.amazonaws.com/napbnb/1020home1.jpg
+&-&-&
+https://s3-us-west-1.amazonaws.com/napbnb/1020home2.jpg
+&-&-&
+https://s3-us-west-1.amazonaws.com/napbnb/1020home3.jpg
+&-&-&
+https://s3-us-west-1.amazonaws.com/napbnb/1020home4.jpg
+&-&-&
+https://s3-us-west-1.amazonaws.com/napbnb/1020home5.jpg
+&-&-&
+https://s3-us-west-1.amazonaws.com/napbnb/1020home6.jpg 
+
+
+ON PAGE LOAD:
+- GET index.html: /10001008/
+- GET /10001008/titleGallery.css   
+- GET /10001008/titleGallery.js
+
+ON COMPONENT-DID-MOUNT: 
+- in JS file: fetchPics(truncated ID) --> fetchPics(1008)
+-- if roomId > 20 then reassign random number < 20
+-- composedUrl = "/headerphotos/18"
+
+TODO
+DATA GENERATOR 
+- save each object as a single line (JSON string) in a file 
+
+
+
