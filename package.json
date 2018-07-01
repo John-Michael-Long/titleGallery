@@ -6,7 +6,7 @@
   "scripts": {
     "react-dev": "webpack -d --watch",
     "start": "nodemon server/index.js",
-    "test": "mocha server/spec",
+    "test": "nyc mocha server/spec/serverSpec.js",
     "lint": "eslint ./"
   },
   "repository": {
@@ -61,6 +61,8 @@
     "mocha": "^5.2.0",
     "newrelic": "^4.2.0",
     "node-lipsum": "^1.0.1",
+    "nyc": "^12.0.2",
+    "request": "^2.87.0",
     "webpack": "^4.10.2",
     "webpack-cli": "^2.1.5"
   }
