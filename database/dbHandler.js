@@ -6,6 +6,8 @@ const redisClient = redis.createClient();
 const {promisify} = require('util');
 
 redisClient.get = util.promisify(redisClient.get);
+redisClient.del = util.promisify(redisClient.del);
+redisClient.exists = util.promisify(redisClient.exists);
 
 const dbConfig = {
   "host" : "localhost",
@@ -52,12 +54,13 @@ const checkCache = roomId => {
 const getAllImagesUrlsByRoomId = (roomId, callback) => {
   checkCache(roomId).then( res => {
     if(res === null) {
-      const queryStr = 'SELECT * FROM image_data INNER JOIN listing_data ON listing_data.id = $1 AND listing_data.thumbnail_set = image_data.image_set'
+      let queryStr = 'SELECT * FROM image_data INNER JOIN listing_data ON listing_data.id = $1 AND listing_data.thumbnail_set = image_data.image_set'
       queryDB(queryStr, [roomId], (err, data) => {
         if(err){
           callback(err, null);
         }
         redisClient.set(roomId, JSON.stringify(data.rows),'EX',1200);
+        console.log('getAllImagesUrlsByRoomId: NEW DATA:', data.rows)
         callback(null, data.rows);
       })
     } else {
@@ -66,6 +69,71 @@ const getAllImagesUrlsByRoomId = (roomId, callback) => {
   })
 };
 
+
+const insertImageIntoDB = (roomId, params, callback) => {
+
+  //get thumbnail set
+  let queryStr = 'SELECT * FROM listing_data WHERE id = $1'
+  queryDB(queryStr, [roomId], (err, data) => {
+    if(err) {
+     return console.log(err) 
+    }
+    console.log('image_set:', data.rows[0].thumbnail_set)
+    console.log('image_count:', data.rows[0].thumbnail_count)
+    
+    let image_set = data.rows[0].thumbnail_set;
+    let thumbnail_id = data.rows[0].thumbnail_count + 1;
+
+    let qParams = [
+                  222222, 
+                  image_set,
+                  thumbnail_id, 
+                  image_set + 'home' + thumbnail_id, 
+                  0, 
+                  1111];  
+
+    //Update listing (thumbnail_count)
+    let queryStr = 'UPDATE listing_data SET thumbnail_count = thumbnail_count + 1 WHERE id = $1'
+    queryDB(queryStr, [roomId], (err, data) => {
+      if(err) {
+        callback(err, null);
+      }
+      console.log('updated listing', data);
+      let queryStr = `INSERT INTO image_data (entry_id, image_set, thumbnail_id, img_file_name, likes, submitter_id) VALUES ($1, $2, $3, $4, $5, $6)`
+      queryDB(queryStr, qParams, (err, data) => {
+        if(err) {
+          callback(err, null);
+        }
+        //UPDATE REDIS
+        console.log('successfully inserted:',  data)
+
+        redisClient.del(roomId).then( res => {
+          getAllImagesUrlsByRoomId(roomId, (err, data) => {
+            if(err) {
+              console.log('err:', err)
+            }
+            console.log('new data:', data);
+            callback(null, data)
+          })
+        })
+      })
+    })
+  })
+}
+
+// const getAllImagesUrlsByRoomId = (roomId, callback) => {
+
+//   const queryStr = 'SELECT * FROM image_data INNER JOIN listing_data ON listing_data.id = $1 AND listing_data.thumbnail_set = image_data.image_set'
+//   queryDB(queryStr, [roomId], (err, data) => {
+//     if(err){
+//       callback(err, null);
+//       return;
+//     }
+//     callback(null, data.rows)
+//   })
+// };
+
 module.exports = {
   getAllImagesUrlsByRoomId,
+  insertImageIntoDB
 };

@@ -35,6 +35,7 @@ app.use((req, res, next) => {
 
 // handle /headerphotos routes
 app.use('/headerphotos', routes);
+//routes(app);
 
 //if it does not go through any routes found above then error
 app.use((req, res, next) => {
