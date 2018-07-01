@@ -22,7 +22,7 @@ scenarios:
     - flow:
         - loop:
             - get:
-              #  url: "/headerphotos/9900003"
+               #url: "/headerphotos/9900003"
                url: "/headerphotos/{{$randomNumber(1, 10000000)}}"
           count: 100
 
