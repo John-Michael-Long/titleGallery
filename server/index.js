@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const http = require('http');
 const path = require('path');
 const routes = require('./routes.js');
+const dbHandler = require('../database/dbHandler');
 const app = express();
 
 // use morgan to log incoming reuests
@@ -29,12 +30,27 @@ app.use((req, res, next) => {
 });
 /* eslint-enable consistent-return */
 
+app.get('/loaderio-0726980ecbaa41edfe4fb6eb8303fc62/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../loaderio-0726980ecbaa41edfe4fb6eb8303fc62.txt'))
+});
+app.get('/loaderio-0726980ecbaa41edfe4fb6eb8303fc62.txt', (req, res) => {
+  res.sendFile(path.join(__dirname, '../loaderio-0726980ecbaa41edfe4fb6eb8303fc62.txt'))
+});
+app.get('/loaderio-0726980ecbaa41edfe4fb6eb8303fc62.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../loaderio-0726980ecbaa41edfe4fb6eb8303fc62.txt'))
+});
+
+app.get('/config', (req, res) => {
+  res.send(dbHandler.dbConfig)
+})
 // serve up the pages
-//app.use('/:id', express.static(path.join(__dirname, '../public')));
-//app.get('/favicon.ico', (req, res) => res.status(204));   
+app.use('/:id', express.static(path.join(__dirname, '../public')));
+app.get('/favicon.ico', (req, res) => res.status(204));   
 
 // handle /headerphotos routes
 app.use('/headerphotos', routes);
+
+
 //routes(app);
 
 //if it does not go through any routes found above then error
@@ -48,6 +64,7 @@ app.use((req, res, next) => {
 /* eslint-disable no-unused-vars */
 app.use((error, req, res, next) => {
   res.status(error.status || 500);
+  console.log('in error handler')
   res.json({
     error: {
       message: error.message,
